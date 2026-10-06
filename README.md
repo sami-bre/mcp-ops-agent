@@ -9,7 +9,7 @@ you can audit**, on a reproducible local k3s (k3d) cluster.
 > model can talk its way around — and traces that let a human audit every step.
 > This repo shows both, end to end, in ~700 lines of readable Python.
 
-Live demo: http://169.58.95.166/mcp-ops-agent/ (self-contained trace report)
+Live demo: https://samibre.dev/mcp-ops-agent/ (self-contained trace report)
 
 ## What you're looking at
 
