@@ -39,6 +39,22 @@ def make_providers(scenario: dict) -> list[tuple[str, object]]:
     return [("mock", MockLLM(scenario["mock_script"]))]
 
 
+async def _resolve_placeholder_pods(tools) -> dict[str, str]:
+    """Discover real pod names so mock scripts can use PAYMENTS_API_POD."""
+    try:
+        out = await tools.call("kubectl_get", {"resource": "pods", "namespace": "demo",
+                                               "output": "json"})
+        data = json.loads(out)
+        if not data.get("ok"):
+            return {}
+        items = (data["result"] or {}).get("items", []) if isinstance(data.get("result"), dict) else []
+        names = [i["metadata"]["name"] for i in items if i.get("metadata", {}).get("name")]
+        payments = next((n for n in names if n.startswith("payments-api")), None)
+        return {"PAYMENTS_API_POD": payments} if payments else {}
+    except Exception:
+        return {}
+
+
 async def main() -> int:
     scenarios = load_scenarios()
     # fresh runs dir each demo so the report reflects exactly this run
@@ -51,6 +67,14 @@ async def main() -> int:
     async with open_mcp_tools() as tools:
         print(f"[demo] MCP server up: {len(tools.tool_schemas)} tools: "
               + ", ".join(t["name"] for t in tools.tool_schemas), flush=True)
+        placeholders = await _resolve_placeholder_pods(tools)
+        if placeholders:
+            print(f"[demo] resolved placeholders: {placeholders}", flush=True)
+        for sc in scenarios:
+            raw = json.dumps(sc["mock_script"])
+            for key, val in placeholders.items():
+                raw = raw.replace(key, val)
+            sc["mock_script"] = json.loads(raw)
         for sc in scenarios:
             for prov_name, provider in make_providers(sc):
                 run_id = new_run_id()

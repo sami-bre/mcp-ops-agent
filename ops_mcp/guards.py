@@ -247,7 +247,7 @@ def run_kubectl(argv: list[str], timeout: float = 15.0) -> str:
                 or "Unable to connect" in err:
             # not a guard denial: a structured environmental error
             raise GuardError(f"cluster_unavailable: {err}", deny=False)
-        raise GuardError(f"kubectl failed: {err[:500]}")
+        raise GuardError(f"kubectl failed: {err[:500]}", deny=False)
     out = proc.stdout
     if len(out) > 8192:
         out = out[:8192] + "\n... [truncated]"

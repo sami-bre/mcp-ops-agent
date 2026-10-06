@@ -17,7 +17,7 @@ import os
 import re
 from typing import Protocol
 
-DEFAULT_OPENROUTER_MODEL = "openrouter/google/gemini-2.5-flash"
+DEFAULT_OPENROUTER_MODEL = "google/gemini-3-flash-preview"
 
 
 class Provider(Protocol):
