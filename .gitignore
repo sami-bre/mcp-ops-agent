@@ -1,0 +1,9 @@
+# artifacts that could contain data/keys never get committed
+runs/
+trace.html
+__pycache__/
+.venv/
+.pytest_cache/
+*.log
+.env*
+!.env.example

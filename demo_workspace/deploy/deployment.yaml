@@ -1,0 +1,25 @@
+# payments-api — k8s manifest (as applied in the k3d demo cluster)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: demo
+  labels:
+    app: payments-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      containers:
+        - name: payments-api
+          image: python:3.12-alpine
+          command: ["python", "-c", "print('[boot] payments-api starting', flush=True); print('[boot] connecting to redis...', flush=True); print('Traceback: PaymentError: redis connection refused', flush=True); import sys; sys.exit(1)"]
+          env:
+            - name: REDIS_URL
+              value: "redis://redis.demo.svc.cluster.local:6379/0"
